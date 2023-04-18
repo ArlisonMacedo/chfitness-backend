@@ -7,11 +7,14 @@ const app = express()
 app.use(express.json())
 
 app.get('/user', async(request, response) => {
+    
     const users = await prisma.user.findMany({
         include: {
             pushings: true
         }
     })
+    
+
     return response.status(200).json(users)
 })
 
@@ -29,6 +32,23 @@ app.get('/user/pushning/:id', async (request, response) => {
 
     return response.status(200).json(user)
 
+})
+
+app.get('/user/pushing/expired', async (request, response) => {
+
+    const users = await prisma.user.findMany({
+        include: {
+            pushings: {
+                where: {
+                    count_day: {
+                        gte: 30
+                    },
+                }
+            }
+        }
+    })
+
+    return response.json(users)
 })
 
 // create users
@@ -148,7 +168,7 @@ app.get('/user/:userid/pushing/:pushingid', async (request, response) => {
                         count_day: 30
                     }
                 })
-                return response.json({message: 'A assinatura do Usuário expirou hoje'})
+                return response.json({message: 'A assinatura do Usuário expira hoje'})
                 
             }
           
