@@ -34,21 +34,24 @@ app.get('/user/pushning/:id', async (request, response) => {
 
 })
 
-app.get('/user/pushing/expired', async (request, response) => {
+app.get('/pushing/expired', async (request, response) => {
 
-    const users = await prisma.user.findMany({
-        include: {
-            pushings: {
-                where: {
-                    count_day: {
-                        gte: 30
-                    },
-                }
+    const pushing = await prisma.pushing.findMany({
+        where: {
+            count_day: {
+                gte: 30
             }
+        },
+        include: {
+            user: true
         }
     })
 
-    return response.json(users)
+    if (!pushing.length) {
+        return response.json({message: 'não há usuarios expirados'})
+    }
+
+    return response.json(pushing)
 })
 
 // create users
