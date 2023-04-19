@@ -48,7 +48,7 @@ app.get('/pushing/expired', async (request, response) => {
     })
 
     if (!pushing.length) {
-        return response.json({message: 'não há usuarios expirados'})
+        return response.json({message: 'Não há Alunos em debitos'})
     }
 
     return response.json(pushing)
@@ -83,7 +83,7 @@ app.post('/pushing/:id', async (request, response) => {
     })
 
     if (!user){
-        return response.status(401).json({message: 'Usuario não encontrado'})
+        return response.status(401).json({message: 'Aluno não encontrado'})
     }
 
     if (day_assin <= 0 || day_assin > 31) {
@@ -118,7 +118,7 @@ app.get('/user/:userid/pushing/:pushingid', async (request, response) => {
     })
 
     if (!user) {
-        return response.status(400).json({message: 'Usuário inexistente'})
+        return response.status(400).json({message: 'Aluno inexistente'})
     }
 
      
@@ -147,7 +147,7 @@ app.get('/user/:userid/pushing/:pushingid', async (request, response) => {
                 }
             })
             if (rest_day?.count_day === 30) {
-                return response.json({message: 'Ops! assinatura do usuário expirada'})
+                return response.json({message: 'Ops! assinatura do Aluno expirada'})
             }
 
             rest_day = await prisma.pushing.update({
@@ -171,14 +171,14 @@ app.get('/user/:userid/pushing/:pushingid', async (request, response) => {
                         count_day: 30
                     }
                 })
-                return response.json({message: 'A assinatura do Usuário expira hoje'})
+                return response.json({message: 'A assinatura do Aluno expira hoje'})
                 
             }
           
         }
         else if (count_day < 0){
             count_day +=  30
-            await prisma.pushing.update({
+            const push = await prisma.pushing.update({
                 where: {
                     id: charge.id
                 },
@@ -187,7 +187,7 @@ app.get('/user/:userid/pushing/:pushingid', async (request, response) => {
                 }
             })
             
-            return response.json(count_day)
+            return response.json(push)
         }
         
         // console.log(day_exp.date())
