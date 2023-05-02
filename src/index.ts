@@ -11,15 +11,56 @@ app.get('/user', async(request, response) => {
     const users = await prisma.user.findMany({
         include: {
             pushings: true
+        },
+        orderBy: {
+            name:  'asc'
         }
     })
+
+    const charges = await prisma.pushing.findMany()
+
+        const day = dayjs()
+        charges.map(async (charge) => {
+            const day_current = dayjs(charge.day_assin).set('date', day.date())
+            const day_exp = dayjs(charge.day_venc)
+            let count_day = day_current.date() - day_exp.date()
+            console.log(count_day)
+
+            await prisma.pushing.updateMany({
+                where: {
+                    id: charge.id
+                },
+                data: {
+                    count_day: count_day
+                }
+            })
+
+            if (count_day < 0){
+                count_day +=  30
+                await prisma.pushing.update({
+                    where: {
+                        id: charge.id
+                    },
+                    data: {
+                        count_day: count_day
+                    }
+                })
+            } 
+
+            count_day = 0
+        })
+
+        // const day_current = dayjs().set('date', day.date())
+        // const day_exp = dayjs(charges.day_venc)
+        // let count_day = day_current.date() - day_exp.date()
+        // console.log(count_day)
     
 
     return response.status(200).json(users)
 })
 
 app.get('/user/pushning/:id', async (request, response) => {
-    const  {id} = request.params 
+    const {id} = request.params 
 
     const user = await prisma.user.findUnique({
         where: {
@@ -184,10 +225,13 @@ app.get('/user/:userid/pushing/:pushingid', async (request, response) => {
                 },
                 data: {
                     count_day: count_day
+                },
+                include: {
+                    user: true
                 }
             })
             
-            return response.json(push)
+            return response.status(200).json(push)
         }
         
         // console.log(day_exp.date())
