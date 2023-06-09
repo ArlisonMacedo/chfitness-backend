@@ -37,7 +37,7 @@ app.get('/user', async(request, response) => {
 
             if (count_day < 0){
                 count_day +=  30
-                await prisma.pushing.update({
+                await prisma.pushing.updateMany({
                     where: {
                         id: charge.id
                     },
@@ -45,6 +45,7 @@ app.get('/user', async(request, response) => {
                         count_day: count_day
                     }
                 })
+                
             } 
 
             count_day = 0
@@ -273,6 +274,29 @@ app.put('/renew/user/pushing/:puid', async (request, response) => {
 
     return response.status(201).json(renew)
     
+})
+
+app.delete('/user/:uid', async (request, response) => {
+    const {uid} = request.params
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: uid
+        }
+    })
+
+    if (user) {
+        await prisma.user.delete({
+            where: {
+                id: uid
+            }
+        })
+    }
+    else {
+        return response.json({message: 'Usuário não existe'})
+    }
+
+    return response.status(200).json({message: 'Usuário delete com sucesso!'})
 })
 
 

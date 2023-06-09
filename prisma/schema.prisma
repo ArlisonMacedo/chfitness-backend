@@ -24,7 +24,7 @@ model Pushing {
   day_assin DateTime
   day_venc  DateTime
   count_day Int?
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
 
   @@map("pushings")
