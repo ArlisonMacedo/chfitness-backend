@@ -21,10 +21,10 @@ app.get('/user', async(request, response) => {
 
         const day = dayjs()
         charges.map(async (charge) => {
-            const day_current = dayjs(charge.day_assin).set('date', day.date())
+            const day_current = dayjs(charge.day_assin).set('date', 1)
             const day_exp = dayjs(charge.day_venc)
             let count_day = day_current.date() - day_exp.date()
-            console.log(count_day)
+            console.log(count_day +=30)
 
             await prisma.pushing.updateMany({
                 where: {
@@ -35,18 +35,18 @@ app.get('/user', async(request, response) => {
                 }
             })
 
-            if (count_day < 0){
-                count_day +=  30
-                await prisma.pushing.updateMany({
-                    where: {
-                        id: charge.id
-                    },
-                    data: {
-                        count_day: count_day
-                    }
-                })
+            // if (count_day < 0){
+            //     count_day +=  30
+            //     await prisma.pushing.updateMany({
+            //         where: {
+            //             id: charge.id
+            //         },
+            //         data: {
+            //             count_day: count_day
+            //         }
+            //     })
                 
-            } 
+            // } 
 
             count_day = 0
         })
