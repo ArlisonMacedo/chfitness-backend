@@ -1,6 +1,7 @@
 import {PrismaClient} from '@prisma/client'
 import express from 'express'
 import dayjs from 'dayjs'
+import { number } from 'zod'
 
 const prisma = new PrismaClient()
 const app = express()
@@ -22,33 +23,24 @@ app.get('/user', async(request, response) => {
         const day = dayjs()
         charges.map(async (charge) => {
             const day_current = dayjs(charge.day_assin).set('date', day.date())
+            // const day_current = dayjs('2023-05-12')
             const day_exp = dayjs(charge.day_venc)
-            let count_day = day_current.date() - day_exp.date()
-            console.log(count_day)
+            
 
-            await prisma.pushing.updateMany({
-                where: {
-                    id: charge.id
-                },
-                data: {
-                    count_day: count_day
-                }
-            })
+            var day1 = dayjs(day_current)
+            var day2 = day_exp
 
-            if (count_day < 0){
-                count_day +=  30
+            let count_day = Math.floor((day1.diff(day2) / (1000 * 60 * 60 *24)))
+            
+          
                 await prisma.pushing.updateMany({
                     where: {
                         id: charge.id
                     },
                     data: {
-                        count_day: count_day
+                        count_day: (count_day * -1)
                     }
                 })
-                
-            } 
-
-            count_day = 0
         })
 
         // const day_current = dayjs().set('date', day.date())
@@ -301,7 +293,7 @@ app.delete('/user/:uid', async (request, response) => {
 
 
 
-app.listen(3000, () => console.log('server is running'))
+app.listen(3000, () => console.log('server is running PORT 3000'))
 
 
 
