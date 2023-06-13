@@ -1,7 +1,6 @@
 import {PrismaClient} from '@prisma/client'
 import express from 'express'
 import dayjs from 'dayjs'
-import { number } from 'zod'
 
 const prisma = new PrismaClient()
 const app = express()
@@ -26,10 +25,11 @@ app.get('/user', async(request, response) => {
             const day_current = dayjs(charge.day_assin).set('date', day.date())
             // const day_current = dayjs('2023-05-12')
             const day_exp = dayjs(charge.day_venc)
-            var day1 = dayjs(day_current)
+            var day1 = dayjs()
             var day2 = day_exp
 
             let count_day = Math.floor((day1.diff(day2) / (1000 * 60 * 60 *24)))
+            console.log(count_day)
             
           
                 await prisma.pushing.updateMany({
